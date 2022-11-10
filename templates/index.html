@@ -18,13 +18,16 @@
 
 <div class="content">
     <div class="form">
-        <form action="/generate/" method="POST">
+        <form action="/" method="POST">
             <h2>Create Playlist</h2>
             <input type="text" name="playlistname" placeholder="New Playlist Name" />
             <select type="text" name="seedgenres" placeholder="Seed Genres">
                 <option value="">Seed Genres</option>
+                {% for genre in genres %}
+                    <option value="genre">{{ genre | capitalize | replace("-"," ") }}</option>
+                {% endfor %}
             </select>
-            <input type="number" name="bpm" placeholder="Beats Per Minute" />
+            <input type="number" name="targettempo" placeholder="Beats Per Minute" />
             <input type="submit" value="Generate playlist" />
         </form>
     </div>

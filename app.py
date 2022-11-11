@@ -1,54 +1,147 @@
-from flask import Flask, render_template, redirect, request
-from spotify import Spotify
+from requests_oauthlib import OAuth2Session
+from flask import Flask, redirect, render_template, request, session
+from flask.json import jsonify
+from time import time
+from clientsecrets import client_id, client_secret
+import os
+import spotify
 
 app = Flask(__name__)
-spotify = Spotify()
 
-app.secret_key = spotify.client_secret
+authorization_base_url = 'https://accounts.spotify.com/authorize?'
+token_url = 'https://accounts.spotify.com/api/token'
+redirect_uri = "http://localhost:5000/callback/"
+scope = "user-library-read playlist-modify-public"
+
+genres = ''
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
     if request.method=="POST":
-        return create_playlist()
-    
-    return render_template('index.html', spotify=spotify, iframe="37i9dQZF1DWXMg4uP5o3dm")
+        return generate_playlist()
+    else:
+        try:
+            token=session['oauth_token']
+            spotify_oauth = OAuth2Session(client_id, token=token)
+            user = spotify_oauth.get('https://api.spotify.com/v1/me').json()
+            session['user'] = user
+            return render_template('index.html', genres=genres)
+        except:
+            return render_template('index.html', genres=genres)
 
-@app.route('/spotify/authorize/')
+@app.route('/authorize/')
 def authorize():
-    url = spotify.get_authorization_url()
-    return redirect(url)
+    # redirect the user to the OAuth provider (Spotify)
+    spotify_oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
+    authorization_url, state = spotify_oauth.authorization_url(authorization_base_url)
 
-@app.route('/spotify/callback/')
+    # state is used to prevent CSRF, keep this for later.
+    session['oauth_state'] = state
+    return redirect(authorization_url)
+
+@app.route('/callback/', methods=["GET"])
 def spotify_callback():
-    spotify.get_user_authorization()
-    genres = spotify.get_seed_genres()
-    return render_template('index.html', spotify=spotify, genres=genres)
+    spotify_oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=session['oauth_state'])
+    token = spotify_oauth.fetch_token(token_url, client_secret=client_secret,
+        authorization_response=request.url)
+    
+    # save token
+    session['oauth_token'] = token
 
-@app.route('/spotify/logout/')
-def spotigfy_logout():
-    spotify.logout()
     return redirect('/')
 
-@app.route('/generate/', methods=['POST', 'GET'])
-def create_playlist():
+@app.route("/automatic_refresh/", methods=["GET"])
+def automatic_refresh():
+    # refresh OAuth 2 token using a refresh token
+    token = session['oauth_token']
+
+    # trigger an automatic refresh by forcing token expiration
+    token['expires_at'] = time() - 10
+
+    extra = {
+        'client_id': client_id,
+        'client_secret': client_secret,
+    }
+
+    def token_updater(token):
+        session['oauth_token'] = token
+
+    spotify_oauth = OAuth2Session(client_id,
+        token=token,
+        auto_refresh_kwargs=extra,
+        auto_refresh_url=token_url,
+        token_updater=token_updater)
+
+    # trigger the automatic refresh
+    jsonify(spotify_oauth.get('https://api.spotify.com/v1/me').json())
+    return jsonify(session['oauth_token'])
+
+@app.route("/manual_refresh/", methods=["GET"])
+def manual_refresh():
+    # refresh an OAuth 2 token using a refresh token
+    token = session['oauth_token']
+
+    extra = {
+        'client_id': client_id,
+        'client_secret': client_secret,
+    }
+
+    spotify_oauth = OAuth2Session(client_id, token=token)
+    session['oauth_token'] = spotify_oauth.refresh_token(token_url, **extra)
+    return jsonify(session['oauth_token'])
+
+@app.route('/logout/')
+def spotify_logout():
+    session.clear()
+    return redirect('/')
+
+@app.route('/refresh/')
+def refresh():
+    return redirect('/')
+
+def generate_playlist():
     # get form data
     playlist_name = request.form['playlistname']
     seed_genres = request.form['seedgenres']
     target_tempo = request.form['targettempo']
 
     # create playlist
-    playlist_id = spotify.create_playlist(playlist_name)
+    playlist_id = spotify.create_playlist(playlist_name, 
+        user_id=session['user']['id'],
+        access_token=session['oauth_token']['access_token']
+        ).json()['id']
 
     # get recommendation songs
-    track_uris = spotify.get_tracks(seed_genres, target_tempo)
+    tracks = spotify.get_recommendations(seed_genres, 
+        target_tempo, 
+        access_token=session['oauth_token']['access_token']
+        ).json()['tracks']
+
+    track_uris = []
+    for track in tracks:
+        track_uris.append(track['uri'])
 
     # add songs to playlist
-    spotify.add_playlist_tracks(playlist_id, track_uris)
+    spotify.add_playlist_tracks(playlist_id, 
+        track_uris,
+        access_token=session['oauth_token']['access_token'])
 
     # get playlist embed
-    iframe = spotify.get_embed(playlist_id)
+    iframe = spotify.get_oEmbed(type="playlist", id=playlist_id).json()['html']
 
-    return render_template('index.html', spotify=spotify, iframe=iframe)
+    return render_template('index.html', iframe=iframe, playlist_id=playlist_id)
+
+@app.route('/delete/<playlist_id>')
+def delete_playlist(playlist_id):
+    spotify.delete_playlist(playlist_id=playlist_id, access_token=session['oauth_token']['access_token'])
+    return redirect('/')
 
 if __name__ == "__main__":
+    # This allows us to use a plain HTTP callback
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = "1"
+    
+    response = spotify.authenticate_app(client_id, client_secret)
+    genres = spotify.get_seed_genres(response.json()['access_token']).json()['genres']
+    
+    app.secret_key = os.urandom(24)
     app.run(debug=True)

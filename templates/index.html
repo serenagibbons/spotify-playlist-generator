@@ -7,11 +7,11 @@
 <nav class="header">
     <h1 class="header-text"><span>Spotify</span> Playlist Generator</h1>
     <div class="links">    
-        {% if spotify.user_id == "" %}
-            <a href="/spotify/authorize/" class="header-link">Log in</a>
+        {% if not 'user' in session %}
+            <a href="/authorize/" class="header-link">Log in</a>
         {% else %}
-            <span>Welcome, {{ spotify.user_name }}</span>
-            <a href="/spotify/logout/" class="header-link">Log out</a>
+            <span>Welcome, {{ session['user']['display_name'] }}</span>
+            <a href="/logout/" class="header-link">Log out</a>
         {% endif %}
     </div>
 </nav>
@@ -24,11 +24,18 @@
             <select type="text" name="seedgenres" placeholder="Seed Genres">
                 <option value="">Seed Genres</option>
                 {% for genre in genres %}
-                    <option value="genre">{{ genre | capitalize | replace("-"," ") }}</option>
+                <option value="{{ genre }}">{{ genre | capitalize | replace("-"," ") }}</option>
                 {% endfor %}
             </select>
             <input type="number" name="targettempo" placeholder="Beats Per Minute" />
+            {% if not iframe %}
             <input type="submit" value="Generate playlist" />
+            {% else %}
+            <div class="buttons">
+                <a href="{{ url_for('refresh') }}" class="button btn-refresh">Create New Playlist</a>
+                <a href="{{ url_for('delete_playlist', playlist_id=playlist_id) }}" class="button btn-delete">Delete playlist</a>
+            </div>
+            {% endif %}
         </form>
     </div>
 

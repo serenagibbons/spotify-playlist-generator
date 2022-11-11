@@ -5,11 +5,13 @@ from time import time
 from clientsecrets import client_id, client_secret
 import os
 import spotify
+import webbrowser
 
 app = Flask(__name__)
 
 authorization_base_url = 'https://accounts.spotify.com/authorize?'
 token_url = 'https://accounts.spotify.com/api/token'
+logout_url = 'https://accounts.spotify.com/logout'
 redirect_uri = "http://localhost:5000/callback/"
 scope = "user-library-read playlist-modify-public"
 
@@ -93,6 +95,7 @@ def manual_refresh():
 @app.route('/logout/')
 def spotify_logout():
     session.clear()
+    webbrowser.open(url=logout_url)
     return redirect('/')
 
 @app.route('/refresh/')

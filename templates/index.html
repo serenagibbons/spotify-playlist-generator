@@ -1,17 +1,22 @@
 {% extends 'base.html' %}
 
-{% block head %}
-{% endblock %}
-
 {% block body %}
+
+{% if not 'user' in session %}
+<div class="login">
+    <h1 class="logo"><span>Spotify</span> Playlist Generator</h1>
+    <a href="/authorize/" class="button">Log in to Spotify</a>
+</div>
+
+{% else %}
 <nav class="header">
-    <h1 class="header-text"><span>Spotify</span> Playlist Generator</h1>
+    <h1 class="logo"><span>Spotify</span> Playlist Generator</h1>
     <div class="links">    
         {% if not 'user' in session %}
-            <a href="/authorize/" class="header-link">Log in</a>
+            <a href="/authorize/" class="nav-link">Log in to Spotify</a>
         {% else %}
             <span>Welcome, {{ session['user']['display_name'] }}</span>
-            <a href="/logout/" class="header-link">Log out</a>
+            <a href="/logout/" class="nav-link">Log out</a>
         {% endif %}
     </div>
 </nav>
@@ -20,14 +25,17 @@
     <div class="form">
         <form action="/" method="POST">
             <h2>Create Playlist</h2>
-            <input type="text" name="playlistname" placeholder="New Playlist Name" />
-            <select type="text" name="seedgenres" placeholder="Seed Genres">
+            <label for="playlistname">Playlist Name</label>
+            <input type="text" name="playlistname" placeholder="New Playlist Name" required/>
+            <label for="playlistname">Genre</label>
+            <select type="text" name="seedgenres" placeholder="Genres" required>
                 <option value="">Seed Genres</option>
                 {% for genre in genres %}
                 <option value="{{ genre }}">{{ genre | capitalize | replace("-"," ") }}</option>
                 {% endfor %}
             </select>
-            <input type="number" name="targettempo" placeholder="Beats Per Minute" />
+            <label for="targettempo">Target Tempo</label>
+            <input type="number" name="targettempo" placeholder="Beats Per Minute (optional)" />
             {% if not iframe %}
             <input type="submit" value="Generate playlist" />
             {% else %}
@@ -39,9 +47,11 @@
         </form>
     </div>
 
-    <div id="embed-iframe" class="embed">
-        {{ iframe | safe }}
+    <div class="embed">
+       {{ iframe | safe }}
     </div>
+
 </div>
+{% endif %}
 
 {% endblock %}

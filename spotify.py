@@ -20,8 +20,11 @@ def get_recommendations(seed_genres, target_tempo, access_token):
     endpoint_url = "https://api.spotify.com/v1/recommendations"
 
     # query the recommendations 
-    q = f'?seed_genres={seed_genres}&target_tempo={target_tempo}'
+    q = f'?seed_genres={seed_genres}'
 
+    if target_tempo:
+        q += f'&target_tempo={target_tempo}'
+        
     response = requests.get(
                 url = f"{endpoint_url}{q}", 
                 headers = {

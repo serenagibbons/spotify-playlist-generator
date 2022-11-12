@@ -1,6 +1,7 @@
 from requests_oauthlib import OAuth2Session
 from flask import Flask, redirect, render_template, url_for, request, session
 from flask.json import jsonify
+from flask_session import Session
 from time import time
 from clientsecrets import client_id, client_secret
 import os
@@ -8,6 +9,9 @@ import spotify
 import webbrowser
 
 app = Flask(__name__)
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
 authorization_base_url = 'https://accounts.spotify.com/authorize?'
 token_url = 'https://accounts.spotify.com/api/token'

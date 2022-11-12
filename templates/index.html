@@ -1,30 +1,44 @@
 {% extends 'base.html' %}
 
 {% block body %}
+<script>
+    function displayDropdown() {
+        document.getElementById("dropdown-content").classList.toggle("show");
+    }
+</script>
 
 {% if not 'user' in session %}
 <div class="login">
     <h1 class="logo"><span>Spotify</span> Playlist Generator</h1>
-    <a href="/authorize/" class="button">Log in to Spotify</a>
+    <a href="/authorize/" class="button btn-login">Log in to Spotify</a>
 </div>
 
 {% else %}
+
 <nav class="header">
     <h1 class="logo"><span>Spotify</span> Playlist Generator</h1>
     <div class="links">    
         {% if not 'user' in session %}
             <a href="/authorize/" class="nav-link">Log in to Spotify</a>
         {% else %}
-            <span>Welcome, {{ session['user']['display_name'] }}</span>
-            <a href="/logout/" class="nav-link">Log out</a>
+            <button class="btn-nav" onclick="displayDropdown()">
+                <img src="{{ session['user']['images'][0]['url'] }}" class="profile-img"/>
+                <span class="user-name">{{ session['user']['display_name'] }}</span><i class="arrow down"></i>
+            </button>
+            <div id="dropdown-content" class="dropdown-content">
+                <a href="/logout/" class="dropdown-link">Log out</a>
+            </div>
         {% endif %}
     </div>
 </nav>
 
+
 <div class="content">
+
+    {% if not iframe %}
     <div class="form">
         <form action="/" method="POST">
-            <h2>Create Playlist</h2>
+            <h2>Create a New Playlist</h2>
             <label for="playlistname">Playlist Name</label>
             <input type="text" name="playlistname" placeholder="New Playlist Name" required/>
             <label for="playlistname">Genre</label>
@@ -36,20 +50,20 @@
             </select>
             <label for="targettempo">Target Tempo</label>
             <input type="number" name="targettempo" placeholder="Beats Per Minute (optional)" />
-            {% if not iframe %}
-            <input type="submit" value="Generate playlist" />
-            {% else %}
-            <div class="buttons">
-                <a href="{{ url_for('refresh') }}" class="button btn-refresh">Create New Playlist</a>
-                <a href="{{ url_for('delete_playlist', playlist_id=playlist_id) }}" class="button btn-delete">Delete playlist</a>
-            </div>
-            {% endif %}
+            <input type="submit" class="button btn-generate" value="Generate playlist" />
         </form>
     </div>
 
+    {% else %}
     <div class="embed">
-       {{ iframe | safe }}
+        {{ iframe | safe }}
+        <div class="buttons">
+            <a href="{{ url_for('refresh') }}" class="button btn-refresh">Create New Playlist</a>
+            <a href="{{ url_for('delete_playlist', playlist_id=playlist_id) }}" class="button btn-delete">Delete playlist</a>
+        </div>
     </div>
+
+    {% endif %}
 
 </div>
 {% endif %}

@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100&display=swap');
 :root {
   --spotify-green: #1ed760;
+  --spotify-dark-grey: #1a1a1a;
   --spotify-grey: #222326;
+  --spotify-light-grey: #333333;
 }
 body {
   margin: 0;
@@ -63,7 +65,6 @@ h1 {
   color:var(--spotify-grey);
   margin:0 0 40px;
   padding:0;
-  text-transform: uppercase;
 }
 .form input, form select{
   position:relative;
@@ -79,18 +80,31 @@ h1 {
 .form input:focus, .form select:focus {
   border-color: var(--spotify-green);
 }
-.form input[type="submit"], a.button {
+a.button {
   padding: 14px 32px;
-  margin: 8px 0;
+  margin: 20px 0;
+  border-radius: 50px;
+  border-style: none;
+  background-color: var(--spotify-green);
+  text-transform: uppercase;
+  color: #000;
+  font-weight: bold;
+  text-decoration: none;
+  text-align: center;
+  line-height: 1;
+}
+.form input[type="submit"] {
+  padding: 14px 32px;
   border-radius: 50px;
   border-style: none;
   background-color: var(--spotify-green);
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   color: #000;
   text-decoration: none;
-  font-size: 12px;
+  text-align: center;
+  margin-top: 20px;
 }
 .form input[type="submit"]:hover, a.button:hover {
   transform: scale(1.04);
@@ -99,15 +113,15 @@ label {
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-
 }
 .content, .login {
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .content {
-  padding-top: 16px;
+  padding-top: 20px;
 }
 .login {
   display: flex;
@@ -128,21 +142,91 @@ form {
 .buttons {
   display: flex;
   justify-content: space-between;
+  margin: 20px 0;
 }
 a.btn-delete {
-  background-color: #000;
+  background-color: #fff;
+  color: #000;
+}
+.btn-nav {
+  background-color: var(--spotify-dark-grey);
   color: #fff;
+  text-transform: none;
+  padding: 4px 8px;
+  font-size: 16px;
+  margin: 0 1rem;
+  border-radius: 50px;
+  border-style: none;
+  text-decoration: none;
+  text-align: center;
+  font-weight: 450;
+  line-height: 1;
+  cursor: pointer;
+}
+.btn-nav:hover {
+  background-color: var(--spotify-grey);
+}
+a.btn-delete, a.btn-refresh, a.btn-generate {
+  margin-top: 20px;
+}
+.profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+.user-name {
+  display: none;
+  padding: 0 4px;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  margin-top: 4px;
+}
+.show {
+  display: block;
+}
+.dropdown-link {
+  text-decoration: none;
+  color:#fff;
+  background-color: var(--spotify-grey);
+  margin: 0 1rem;
+  padding: 8px 16px;
+  display: block;
+  font-size: 14px;
+}
+.dropdown-link:hover {
+  background-color: var(--spotify-light-grey);
+}
+.arrow {
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  padding: 3px;
+  margin: 4px;
+  display: none;
+}
+.down {
+  transform: rotate(45deg);
 }
 
+
 @media (min-width: 768px) {
-  .content {
-	  display: flex;
-  }
   .form {
     width: 50%;
   }
   .embed {
     width: 50%;
+  }
+}
+
+@media (min-width: 600px) {
+  .user-name, i.arrow {
+    display: inline-block;
   }
 }
 
@@ -153,6 +237,19 @@ a.btn-delete {
   }
   .embed {
     margin: 50px;
+  }
+  .form input[type="submit"], a.button {
+    letter-spacing: 1.5px;
+  }
+  .btn-login {
+    letter-spacing: 1.5px;
+  }
+  a.btn-delete, a.btn-refresh, a.btn-generate {
+    margin-top: 20px;
+    line-height: initial;
+  }
+  a.btn-delete, a.btn-refresh {
+    margin: 20px 8px 8px 8px;
   }
 }
 

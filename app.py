@@ -1,5 +1,5 @@
 from requests_oauthlib import OAuth2Session
-from flask import Flask, redirect, render_template, request, session
+from flask import Flask, redirect, render_template, url_for, request, session
 from flask.json import jsonify
 from time import time
 from clientsecrets import client_id, client_secret
@@ -12,8 +12,8 @@ app = Flask(__name__)
 authorization_base_url = 'https://accounts.spotify.com/authorize?'
 token_url = 'https://accounts.spotify.com/api/token'
 logout_url = 'https://accounts.spotify.com/logout'
-redirect_uri = "http://localhost:5000/callback/"
-scope = "user-library-read playlist-modify-public"
+redirect_uri = 'callback'
+scope = 'user-library-read playlist-modify-public'
 
 genres = ''
 
@@ -34,7 +34,7 @@ def index():
 @app.route('/authorize/')
 def authorize():
     # redirect the user to the OAuth provider (Spotify)
-    spotify_oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
+    spotify_oauth = OAuth2Session(client_id, scope=scope, redirect_uri=url_for(redirect_uri, _external=True))
     authorization_url, state = spotify_oauth.authorization_url(authorization_base_url)
 
     # state is used to prevent CSRF, keep this for later.
@@ -42,9 +42,9 @@ def authorize():
     return redirect(authorization_url)
 
 @app.route('/callback/', methods=["GET"])
-def spotify_callback():
-    spotify_oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=session['oauth_state'])
-    token = spotify_oauth.fetch_token(token_url, client_secret=client_secret,
+def callback():
+    spotify_oauth = OAuth2Session(client_id, redirect_uri=url_for(redirect_uri, _external=True), state=session['oauth_state'])
+    token = spotify_oauth.fetch_token(token_url, client_secret=client_secret, 
         authorization_response=request.url)
     
     # save token

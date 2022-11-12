@@ -15,7 +15,7 @@
 
 {% else %}
 
-<nav class="header">
+<nav class="navbar">
     <h1 class="logo"><span>Spotify</span> Playlist Generator</h1>
     <div class="links">    
         {% if not 'user' in session %}
@@ -57,7 +57,7 @@
     {% else %}
     <div class="embed">
         {{ iframe | safe }}
-        <div class="buttons">
+        <div class="buttons-group">
             <a href="{{ url_for('refresh') }}" class="button btn-refresh">Create New Playlist</a>
             <a href="{{ url_for('delete_playlist', playlist_id=playlist_id) }}" class="button btn-delete">Delete playlist</a>
         </div>

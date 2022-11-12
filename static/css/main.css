@@ -12,13 +12,35 @@ body {
   background-color: #000;
   height: 100vh;
 } 
+.content, .login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.content {
+  padding-top: 20px;
+}
+.login {
+  flex-direction: column;
+  text-align: center;
+}
+.logo {
+  margin: 1rem;
+  font-size: 1.2rem;
+  color: #fff;
+}
+.login > .logo {
+  font-size: 1.6em;
+}
 h1 span {
   font-weight: 700;
 }  
 h1 {
   font-weight: 400;
 }
-.header {
+/********** Nav **********/
+.navbar {
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -43,14 +65,51 @@ h1 {
   color: var(--spotify-green);
   transition: ease-in-out 0.2s;
 }  
-.logo {
-  margin: 1rem;
-  font-size: 1.2rem;
-  color: #fff;
+.profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  vertical-align: middle;
 }
-.login > .logo {
-  font-size: 1.6em;
+.user-name {
+  display: none;
+  padding: 0 4px;
 }
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  margin-top: 4px;
+}
+.show {
+  display: block;
+}
+.dropdown-link {
+  text-decoration: none;
+  color:#fff;
+  background-color: var(--spotify-grey);
+  margin: 0 1rem 0 0;
+  padding: 8px 16px;
+  display: block;
+  font-size: 14px;
+}
+.dropdown-link:hover {
+  background-color: var(--spotify-light-grey);
+}
+.arrow {
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  padding: 3px;
+  margin: 4px;
+  display: none;
+}
+.down {
+  transform: rotate(45deg);
+}
+/********** Form **********/
 .form {
   align-self: center;
   min-height: 400px;
@@ -80,20 +139,25 @@ h1 {
 .form input:focus, .form select:focus {
   border-color: var(--spotify-green);
 }
-a.button {
-  padding: 14px 32px;
-  margin: 20px 0;
-  border-radius: 50px;
-  border-style: none;
-  background-color: var(--spotify-green);
-  text-transform: uppercase;
-  color: #000;
-  font-weight: bold;
-  text-decoration: none;
-  text-align: center;
-  line-height: 1;
+form {
+  width: 100%;
 }
-.form input[type="submit"] {
+label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+/********** Iframe **********/
+.embed {
+  margin: 32px;
+  align-self: center;
+  min-height: 400px;
+}
+iframe {
+  width: 100%;
+}
+/********** Buttons **********/
+.form input[type="submit"], .button {
   padding: 14px 32px;
   border-radius: 50px;
   border-style: none;
@@ -106,45 +170,22 @@ a.button {
   text-align: center;
   margin-top: 20px;
 }
-.form input[type="submit"]:hover, a.button:hover {
+.form input[type="submit"]:hover, .button:hover {
   transform: scale(1.04);
 }
-label {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-.content, .login {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.content {
-  padding-top: 20px;
-}
-.login {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-}
-.embed {
-  margin: 32px;
-  align-self: center;
-  min-height: 400px;
-}
-iframe {
-  width: 100%;
-}
-form {
-  width: 100%;
-}
-.buttons {
+.buttons-group {
   display: flex;
   justify-content: space-between;
   margin: 20px 0;
 }
-a.btn-delete {
+.buttons-group > .button {
+  margin: 20px 8px 8px 8px;
+  letter-spacing: initial;
+  line-height: 1;
+  font-size: 14px;
+  padding: 7px 16px;
+}
+.btn-delete {
   background-color: #fff;
   color: #000;
 }
@@ -152,7 +193,7 @@ a.btn-delete {
   background-color: var(--spotify-dark-grey);
   color: #fff;
   text-transform: none;
-  padding: 4px 8px;
+  padding: 1px;
   font-size: 16px;
   margin: 0 1rem;
   border-radius: 50px;
@@ -166,60 +207,9 @@ a.btn-delete {
 .btn-nav:hover {
   background-color: var(--spotify-grey);
 }
-a.btn-delete, a.btn-refresh, a.btn-generate {
-  margin-top: 20px;
-}
-.profile-img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  vertical-align: middle;
-}
-.user-name {
-  display: none;
-  padding: 0 4px;
-}
-.dropdown-content {
-  display: none;
-  position: absolute;
-  right: 0;
-  min-width: 200px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-  margin-top: 4px;
-}
-.show {
-  display: block;
-}
-.dropdown-link {
-  text-decoration: none;
-  color:#fff;
-  background-color: var(--spotify-grey);
-  margin: 0 1rem;
-  padding: 8px 16px;
-  display: block;
-  font-size: 14px;
-}
-.dropdown-link:hover {
-  background-color: var(--spotify-light-grey);
-}
-.arrow {
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  padding: 3px;
-  margin: 4px;
-  display: none;
-}
-.down {
-  transform: rotate(45deg);
-}
-
 
 @media (min-width: 768px) {
   .form {
-    width: 50%;
-  }
-  .embed {
     width: 50%;
   }
 }
@@ -228,9 +218,13 @@ a.btn-delete, a.btn-refresh, a.btn-generate {
   .user-name, i.arrow {
     display: inline-block;
   }
+  .form input[type="submit"], .button {
+    letter-spacing: 1.5px;
+    line-height: initial;
+  }
 }
 
-@media (min-width: 400px) {
+@media (min-width: 430px) {
   .form {
     padding: 50px;
     margin: 50px;
@@ -238,18 +232,8 @@ a.btn-delete, a.btn-refresh, a.btn-generate {
   .embed {
     margin: 50px;
   }
-  .form input[type="submit"], a.button {
-    letter-spacing: 1.5px;
-  }
-  .btn-login {
-    letter-spacing: 1.5px;
-  }
-  a.btn-delete, a.btn-refresh, a.btn-generate {
-    margin-top: 20px;
-    line-height: initial;
-  }
-  a.btn-delete, a.btn-refresh {
-    margin: 20px 8px 8px 8px;
+  .buttons-group > .button {
+    padding: 14px 32px;
   }
 }
 

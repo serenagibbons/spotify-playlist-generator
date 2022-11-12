@@ -1,4 +1,6 @@
-clientsecrets.py
-*.pyc
+__pycache__
 build
+env
 flask_session
+
+.env

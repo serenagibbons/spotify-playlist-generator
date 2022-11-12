@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, url_for, request, session
 from flask.json import jsonify
 from flask_session import Session
 from time import time
-from clientsecrets import client_id, client_secret
+from dotenv import load_dotenv
 import os
 import spotify
 import webbrowser
@@ -13,27 +13,27 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+load_dotenv()
+client_id = os.environ['CLIENT_ID']
+client_secret = os.environ['CLIENT_SECRET']
+
 authorization_base_url = 'https://accounts.spotify.com/authorize?'
 token_url = 'https://accounts.spotify.com/api/token'
 logout_url = 'https://accounts.spotify.com/logout'
 redirect_uri = 'callback'
 scope = 'user-library-read playlist-modify-public'
-
 genres = ''
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/', methods=['GET'])
 def index():
-    if request.method=="POST":
-        return generate_playlist()
-    else:
-        try:
-            token=session['oauth_token']
-            spotify_oauth = OAuth2Session(client_id, token=token)
-            user = spotify_oauth.get('https://api.spotify.com/v1/me').json()
-            session['user'] = user
-            return render_template('index.html', genres=genres)
-        except:
-            return render_template('index.html', genres=genres)
+    try:
+        token=session['oauth_token']
+        spotify_oauth = OAuth2Session(client_id, token=token)
+        user = spotify_oauth.get('https://api.spotify.com/v1/me').json()
+        session['user'] = user
+        return render_template('index.html', genres=genres)
+    except:
+        return render_template('index.html', genres=genres)
 
 @app.route('/authorize/')
 def authorize():
@@ -106,6 +106,7 @@ def spotify_logout():
 def refresh():
     return redirect('/')
 
+@app.route('/', methods=['POST'])
 def generate_playlist():
     # get form data
     playlist_name = request.form['playlistname']
@@ -143,10 +144,7 @@ def delete_playlist(playlist_id):
     spotify.delete_playlist(playlist_id=playlist_id, access_token=session['oauth_token']['access_token'])
     return redirect('/')
 
-if __name__ == "__main__":
-    # This allows us to use a plain HTTP callback
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = "1"
-    
+if __name__ == "__main__":    
     response = spotify.authenticate_app(client_id, client_secret)
     genres = spotify.get_seed_genres(response.json()['access_token']).json()['genres']
     

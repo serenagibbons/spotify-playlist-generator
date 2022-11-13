@@ -18,17 +18,13 @@
 <nav class="navbar">
     <h1 class="logo"><span>Spotify</span> Playlist Generator</h1>
     <div class="links">    
-        {% if not 'user' in session %}
-            <a href="/authorize/" class="nav-link">Log in to Spotify</a>
-        {% else %}
-            <button class="btn-nav" onclick="displayDropdown()">
-                <img src="{{ session['user']['images'][0]['url'] }}" class="profile-img"/>
-                <span class="user-name">{{ session['user']['display_name'] }}</span><i class="arrow down"></i>
-            </button>
-            <div id="dropdown-content" class="dropdown-content">
-                <a href="/logout/" class="dropdown-link">Log out</a>
-            </div>
-        {% endif %}
+        <button class="btn-nav" onclick="displayDropdown()">
+            <img src="{{ session['user']['images'][0]['url'] }}" class="profile-img"/>
+            <span class="user-name">{{ session['user']['display_name'] }}</span><i class="arrow down"></i>
+        </button>
+        <div id="dropdown-content" class="dropdown-content">
+            <a href="/logout/" class="dropdown-link">Log out</a>
+        </div>
     </div>
 </nav>
 

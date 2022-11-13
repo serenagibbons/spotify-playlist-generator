@@ -22,18 +22,22 @@ token_url = 'https://accounts.spotify.com/api/token'
 logout_url = 'https://accounts.spotify.com/logout'
 redirect_uri = 'callback'
 scope = 'user-library-read playlist-modify-public'
-genres = ''
 
 @app.route('/', methods=['GET'])
 def index():
     try:
+        # get user
         token=session['oauth_token']
         spotify_oauth = OAuth2Session(client_id, token=token)
         user = spotify_oauth.get('https://api.spotify.com/v1/me').json()
         session['user'] = user
+
+        # get genres
+        response = spotify.authenticate_app(client_id, client_secret)
+        genres = spotify.get_seed_genres(response.json()['access_token']).json()['genres']
         return render_template('index.html', genres=genres)
     except:
-        return render_template('index.html', genres=genres)
+        return render_template('index.html')
 
 @app.route('/authorize/')
 def authorize():
@@ -144,9 +148,6 @@ def delete_playlist(playlist_id):
     spotify.delete_playlist(playlist_id=playlist_id, access_token=session['oauth_token']['access_token'])
     return redirect('/')
 
-if __name__ == "__main__":    
-    response = spotify.authenticate_app(client_id, client_secret)
-    genres = spotify.get_seed_genres(response.json()['access_token']).json()['genres']
-    
+if __name__ == "__main__":  
     app.secret_key = os.urandom(24)
     app.run(debug=True)

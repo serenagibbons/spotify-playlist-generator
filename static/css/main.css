@@ -209,7 +209,7 @@ iframe {
 }
 
 @media (min-width: 768px) {
-  .form {
+  .form, .embed {
     width: 50%;
   }
 }
